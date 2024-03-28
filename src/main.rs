@@ -1,7 +1,6 @@
 use anyhow::Result;
-use interpack::huffman_decode;
-use interpack::huffman_encode;
 use interpack::util::memory_map::LineByLine;
+use interpack::{huffman_decode, huffman_encode};
 
 fn main() -> Result<()> {
     let compressor = huffman_encode::Writer::new("fasta/toy.fa", "toy.fa.hfmn.bin", 67108864);
@@ -15,7 +14,7 @@ fn main() -> Result<()> {
 
     let decoder = huffman_decode::Extractor::new("toy.fa.hfmn.bin", 67108864);
     let _ = decoder.access(2);
-    
+
     Ok(())
 }
 
