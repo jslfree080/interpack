@@ -1,0 +1,10 @@
+[package]
+name = "interpack"
+version = "0.1.0"
+authors = ["Jung Soo Lee <jslfree080@gmail.com>"]
+license = "GPL-3.0"
+edition = "2021"
+
+[dependencies]
+memmap2 = "0.9.4"
+anyhow = "1.0"
