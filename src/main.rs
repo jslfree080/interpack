@@ -13,7 +13,8 @@ fn main() -> Result<()> {
     // let _ = compressor.line_by_line(false);
 
     let decoder = huffman_decode::Extractor::new("toy.fa.hfmn.bin", 67108864);
-    let _ = decoder.access(2);
+    let sub_seq = decoder.access(2);
+    println!("\n{sub_seq:?}");
 
     Ok(())
 }

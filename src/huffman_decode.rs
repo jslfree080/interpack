@@ -11,7 +11,7 @@ impl Extractor {
         }
     }
 
-    pub fn access(&self, seq_num: usize) {
-        // TODO: Extract information from output binary file
+    pub fn access(&self, seq_num: usize) -> &str {
+        "TODO: Extract information from output binary file"
     }
 }
