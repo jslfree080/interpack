@@ -1,0 +1,1 @@
+<img alt="Using BufWriter with less frequency of manual flushing mitigate the performance overhead" src="https://github.com/jslfree080/interpack/blob/master/flamegraph.svg" width=1000>

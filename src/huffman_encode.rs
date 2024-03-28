@@ -93,27 +93,29 @@ impl LineByLine for Writer {
                         ));
                     }
 
-                    print!(
-                        "{}",
-                        format_args!(
-                            "{:0width$b}",
-                            // (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
-                            //     +
-                            (0b110u8
-                                * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
-                                    & (*elm_byte & 1u8)
-                                    & 1u8))
-                                + (0b10u8 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
-                                + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
-                                + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
-                            width = match *elm_byte {
-                                b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
-                                b'c' | b'C' => 3,
-                                b'n' | b'N' => 4,
-                                _ => 0,
-                            }
-                        )
-                    );
+                    if print {
+                        print!(
+                            "{}",
+                            format_args!(
+                                "{:0width$b}",
+                                // (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
+                                //     +
+                                (0b110u8
+                                    * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
+                                        & (*elm_byte & 1u8)
+                                        & 1u8))
+                                    + (0b10u8 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
+                                    + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
+                                    + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
+                                width = match *elm_byte {
+                                    b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
+                                    b'c' | b'C' => 3,
+                                    b'n' | b'N' => 4,
+                                    _ => 0,
+                                }
+                            )
+                        );
+                    }
 
                     for bit in format!(
                         "{:0width$b}",
@@ -152,7 +154,9 @@ impl LineByLine for Writer {
                     }
                 }
 
-                println!();
+                if print {
+                    println!();
+                }
             }
 
             if line[0] == b'>' {
