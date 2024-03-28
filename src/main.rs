@@ -1,4 +1,5 @@
 use anyhow::Result;
+use interpack::huffman_decode;
 use interpack::huffman_encode;
 use interpack::util::memory_map::LineByLine;
 
@@ -11,6 +12,10 @@ fn main() -> Result<()> {
     //     67108864,
     // );
     // let _ = compressor.line_by_line(false);
+
+    let decoder = huffman_decode::Extractor::new("toy.fa.hfmn.bin", 67108864);
+    let _ = decoder.access(2);
+    
     Ok(())
 }
 
