@@ -9,7 +9,7 @@ fn main() -> Result<()> {
 }
 
 // TODO: Extract information from output binary file
-//       Add test codes
+//       Add test codes / CLI
 // cargo build --release
 // time target/release/interpack
 // cargo flamegraph --open --root -- target/release/interpack
