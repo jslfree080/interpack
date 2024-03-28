@@ -10,6 +10,7 @@ fn main() -> Result<()> {
     //     "fasta/human_g1k_v37_decoy.fasta",
     //     "human_g1k_v37_decoy.fasta.hfmn.bin",
     //     67108864,
+    //     false
     // );
     // let _ = compressor.line_by_line(false);
 
