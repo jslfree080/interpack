@@ -8,14 +8,21 @@ pub struct Writer {
     input: String,
     output: String,
     chunk: usize,
+    g_is_three_bit: bool,
 }
 
 impl Writer {
-    pub fn new(input_param: &str, output_param: &str, chunk_param: usize) -> Self {
+    pub fn new(
+        input_param: &str,
+        output_param: &str,
+        chunk_param: usize,
+        g_is_three_bit_param: bool,
+    ) -> Self {
         Self {
             input: input_param.to_string(),
             output: output_param.to_string(),
             chunk: chunk_param,
+            g_is_three_bit: g_is_three_bit_param,
         }
     }
 }
@@ -32,6 +39,11 @@ impl LineByLine for Writer {
 
         // Read the file line by line
         let (mut pos, mut line_number) = (0, 1);
+
+        let c_g_encode_pair = match self.g_is_three_bit {
+            true => (0b10u8, 0b110u8),
+            false => (0b110u8, 0b10u8),
+        };
 
         while pos < len {
             // Calculate the size of the chunk to map
@@ -97,18 +109,26 @@ impl LineByLine for Writer {
                                 "{:0width$b}",
                                 // (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
                                 //     +
-                                (0b110u8
+                                (c_g_encode_pair.0
                                     * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
                                         & (*elm_byte & 1u8)
                                         & 1u8))
-                                    + (0b10u8 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
+                                    + (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
                                     + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
                                     + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
-                                width = match *elm_byte {
-                                    b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
-                                    b'c' | b'C' => 3,
-                                    b'n' | b'N' => 4,
-                                    _ => 0,
+                                width = match self.g_is_three_bit {
+                                    true => match *elm_byte {
+                                        b'a' | b'A' | b'c' | b'C' | b't' | b'T' => 2,
+                                        b'g' | b'G' => 3,
+                                        b'n' | b'N' => 4,
+                                        _ => 0,
+                                    },
+                                    false => match *elm_byte {
+                                        b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
+                                        b'c' | b'C' => 3,
+                                        b'n' | b'N' => 4,
+                                        _ => 0,
+                                    },
                                 }
                             )
                         );
@@ -118,18 +138,26 @@ impl LineByLine for Writer {
                         "{:0width$b}",
                         // (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
                         //     +
-                        (0b110u8
+                        (c_g_encode_pair.0
                             * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
                                 & (*elm_byte & 1u8)
                                 & 1u8))
-                            + (0b10u8 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
+                            + (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
                             + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
                             + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
-                        width = match *elm_byte {
-                            b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
-                            b'c' | b'C' => 3,
-                            b'n' | b'N' => 4,
-                            _ => 0,
+                        width = match self.g_is_three_bit {
+                            true => match *elm_byte {
+                                b'a' | b'A' | b'c' | b'C' | b't' | b'T' => 2,
+                                b'g' | b'G' => 3,
+                                b'n' | b'N' => 4,
+                                _ => 0,
+                            },
+                            false => match *elm_byte {
+                                b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
+                                b'c' | b'C' => 3,
+                                b'n' | b'N' => 4,
+                                _ => 0,
+                            },
                         }
                     )
                     .chars()
@@ -157,17 +185,26 @@ impl LineByLine for Writer {
             }
 
             if line[0] == b'>' {
-                // Sequence separate with 0b1111
-                for _ in 0..4 {
-                    packed_byte = (packed_byte << 1) | 1u8;
-                    remaining_bits -= 1u8;
+                if line_number == 1 {
+                    match self.g_is_three_bit {
+                        true => buffered_output_file.write_all(&[0b11101111u8])?,
+                        false => buffered_output_file.write_all(&[0b10101111u8])?,
+                    }
+                    // Manual flushing
+                    buffered_output_file.flush()?;
+                } else {
+                    // Sequence separate with 0b1111
+                    for _ in 0..4 {
+                        packed_byte = (packed_byte << 1) | 1u8;
+                        remaining_bits -= 1u8;
 
-                    if remaining_bits == 0u8 {
-                        buffered_output_file.write_all(&[packed_byte])?;
-                        // Manual flushing
-                        buffered_output_file.flush()?;
-                        packed_byte = 0u8;
-                        remaining_bits = 8u8;
+                        if remaining_bits == 0u8 {
+                            buffered_output_file.write_all(&[packed_byte])?;
+                            // Manual flushing
+                            buffered_output_file.flush()?;
+                            packed_byte = 0u8;
+                            remaining_bits = 8u8;
+                        }
                     }
                 }
             }

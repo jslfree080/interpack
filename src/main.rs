@@ -3,7 +3,8 @@ use interpack::util::memory_map::LineByLine;
 use interpack::{huffman_decode, huffman_encode};
 
 fn main() -> Result<()> {
-    let compressor = huffman_encode::Writer::new("fasta/toy.fa", "toy.fa.hfmn.bin", 67108864);
+    let compressor =
+        huffman_encode::Writer::new("fasta/toy.fa", "toy.fa.hfmn.bin", 67108864, false);
     let _ = compressor.line_by_line(true);
     // let compressor = huffman_encode::Writer::new(
     //     "fasta/human_g1k_v37_decoy.fasta",
