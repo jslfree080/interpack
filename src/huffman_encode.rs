@@ -56,9 +56,6 @@ impl LineByLine for Writer {
                 println!("{line_str:?}");
             }
 
-            // Interpretation: Sequence separate with 0b1111
-            //                 Last sequence separate with 0b1 / 0b11 / ... / 0b11111111
-
             if !line.is_empty() && line[0] != b'>' {
                 for mut elm_byte in line {
                     match elm_byte {
@@ -160,6 +157,7 @@ impl LineByLine for Writer {
             }
 
             if line[0] == b'>' {
+                // Sequence separate with 0b1111
                 for _ in 0..4 {
                     packed_byte = (packed_byte << 1) | 1u8;
                     remaining_bits -= 1u8;
@@ -179,6 +177,7 @@ impl LineByLine for Writer {
             line_number += 1;
         }
 
+        // Last sequence separate with 0b1 / 0b11 / ... / 0b11111111
         for _ in 0..8 {
             packed_byte = (packed_byte << 1) | 1u8;
             remaining_bits -= 1u8;
