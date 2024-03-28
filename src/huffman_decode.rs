@@ -12,6 +12,6 @@ impl Extractor {
     }
 
     pub fn access(&self, seq_num: usize) {
-        println!("\n{seq_num:?}");
+        // TODO: Extract information from output binary file
     }
 }
