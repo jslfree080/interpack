@@ -14,15 +14,14 @@ fn main() -> Result<()> {
     // );
     // let _ = compressor.line_by_line(false);
 
-    let decoder = huffman_decode::Extractor::new("toy.fa.hfmn.bin", 67108864);
-    let sub_seq = decoder.access(2);
-    println!("\n{sub_seq:?}");
+    let decoder = huffman_decode::Extractor::new("toy.fa.hfmn.bin");
+    let second_seq = decoder.access(2)?;
+    println!("\n{second_seq:?}");
 
     Ok(())
 }
 
-// TODO: Extract information from output binary file
-//       Add test codes / CLI
+// TODO: Add test codes / CLI / minor options
 
 // cargo build --release
 // time target/release/interpack
