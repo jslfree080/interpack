@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 memmap2 = "0.9.4"
 anyhow = "1.0"
+clap = "4.5.4"

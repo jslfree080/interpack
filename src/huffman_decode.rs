@@ -19,14 +19,14 @@ impl Extractor {
         let mmap = unsafe { MmapOptions::new().map(&file).unwrap() };
         let byte_len = mmap.len();
 
-        let mut sub_seq = String::from("");
+        let mut sub_seq = String::with_capacity(byte_len * 8);
         let mut packed_byte = 0u8;
 
         let (mut pos, mut current_num, mut sub_pos) = (1, 1, 1);
-        
-        let mut two_b_three_b = ("G", "C");
+
+        let mut two_b_three_b = ('G', 'C');
         match mmap[0] {
-            239 => two_b_three_b = ("C", "G"),
+            239 => two_b_three_b = ('C', 'G'),
             175 => {}
             _ => return Err(anyhow::anyhow!("Invalid file to decode")),
         }
@@ -42,13 +42,13 @@ impl Extractor {
                 };
 
                 packed_byte = (packed_byte << 1) | bit_value;
-                
+
                 match packed_byte {
                     0 => match sub_pos {
                         1 => sub_pos = 2,
                         2 => {
                             if current_num == seq_num {
-                                sub_seq = format!("{}{}", sub_seq, "A");
+                                sub_seq.push('A');
                             }
                             packed_byte = 0u8;
                             sub_pos = 1;
@@ -59,7 +59,7 @@ impl Extractor {
                         1 => sub_pos = 2,
                         2 => {
                             if current_num == seq_num {
-                                sub_seq = format!("{}{}", sub_seq, "T");
+                                sub_seq.push('T');
                             }
                             packed_byte = 0u8;
                             sub_pos = 1;
@@ -68,7 +68,7 @@ impl Extractor {
                     },
                     2 => {
                         if current_num == seq_num {
-                            sub_seq = format!("{}{}", sub_seq, two_b_three_b.0);
+                            sub_seq.push(two_b_three_b.0);
                         }
                         packed_byte = 0u8;
                         sub_pos = 1;
@@ -76,7 +76,7 @@ impl Extractor {
                     3 => {}
                     6 => {
                         if current_num == seq_num {
-                            sub_seq = format!("{}{}", sub_seq, two_b_three_b.1);
+                            sub_seq.push(two_b_three_b.1);
                         }
                         packed_byte = 0u8;
                         sub_pos = 1;
@@ -84,7 +84,7 @@ impl Extractor {
                     7 => {}
                     14 => {
                         if current_num == seq_num {
-                            sub_seq = format!("{}{}", sub_seq, "N");
+                            sub_seq.push('N');
                         }
                         packed_byte = 0u8;
                         sub_pos = 1;
