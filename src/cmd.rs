@@ -4,9 +4,7 @@ use clap::{Arg, Command};
 //       Subcommand isolation
 pub fn configure() -> Command {
     Command::new("interpack")
-        .about(
-            "DNA FASTA encoder for compressing raw sequences into searchable binary format",
-        )
+        .about("DNA FASTA encoder for compressing raw sequences into searchable binary format")
         .arg_required_else_help(true)
         .subcommand(
             Command::new("code")
