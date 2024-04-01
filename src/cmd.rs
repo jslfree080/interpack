@@ -5,17 +5,17 @@ use clap::{Arg, Command};
 pub fn configure() -> Command {
     Command::new("interpack")
         .about(
-            "DNA FASTA encoder for compressing raw sequences into direct searchable binary format",
+            "DNA FASTA encoder for compressing raw sequences into searchable binary format",
         )
         .arg_required_else_help(true)
         .subcommand(
             Command::new("code")
-                .about("Encode into direct searchable binary format")
+                .about("Encode into searchable binary format")
                 .arg(
                     Arg::new("fasta")
                         .short('f')
                         .long("fasta")
-                        .help("Sets fasta name")
+                        .help("Specify the fasta name")
                         .value_parser(clap::value_parser!(String))
                         .required(true),
                 )
@@ -23,14 +23,14 @@ pub fn configure() -> Command {
                     Arg::new("output")
                         .short('o')
                         .long("output")
-                        .help("Sets the output")
+                        .help("Specify the output binary name")
                         .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("chunk")
                         .short('c')
                         .long("chunk")
-                        .help("Sets the chunk")
+                        .help("Specify chunk")
                         .value_parser(clap::value_parser!(usize))
                         .default_value("67108864"),
                 )
@@ -53,12 +53,12 @@ pub fn configure() -> Command {
         )
         .subcommand(
             Command::new("decode")
-                .about("Search for nth sequence from binary format")
+                .about("Search for nth sequence from searchable binary file")
                 .arg(
                     Arg::new("input")
                         .short('i')
                         .long("input")
-                        .help("Specify binary input")
+                        .help("Specify searchable binary file")
                         .value_parser(clap::value_parser!(String))
                         .required(true),
                 )
@@ -66,7 +66,7 @@ pub fn configure() -> Command {
                     Arg::new("number")
                         .short('n')
                         .long("number")
-                        .help("Look for nth sequence")
+                        .help("Specify nth sequence")
                         .value_parser(clap::value_parser!(usize))
                         .required(true),
                 ),
