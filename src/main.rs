@@ -26,7 +26,7 @@ fn main() -> Result<()> {
                 process.1.get_one::<String>("input").unwrap().as_str(),
             );
             let sub_seq = decoder.access(*process.1.get_one::<usize>("number").unwrap())?;
-            println!("\n{sub_seq:?}");
+            println!("{}", sub_seq);
         }
         _ => {
             return Err(anyhow::anyhow!("Invalid process.0"));
