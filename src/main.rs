@@ -12,14 +12,14 @@ fn main() -> Result<()> {
     let process = matches.subcommand().unwrap();
 
     match process.0 {
-        "code" => {
-            let compressor = huffman_encode::Writer::new(
+        "encode" => {
+            let encoder = huffman_encode::Writer::new(
                 process.1.get_one::<String>("fasta").unwrap().as_str(),
                 process.1.get_one::<String>("output").unwrap().as_str(),
                 *process.1.get_one::<usize>("chunk").unwrap(),
                 *process.1.get_one::<bool>("switch").unwrap(),
             );
-            let _ = compressor.line_by_line(*process.1.get_one::<bool>("print").unwrap());
+            let _ = encoder.line_by_line(*process.1.get_one::<bool>("print").unwrap());
         }
         "decode" => {
             let decoder = huffman_decode::Extractor::new(
@@ -41,8 +41,8 @@ fn main() -> Result<()> {
 // cargo build --release
 // cargo install --path .
 
-// interpack code -f fasta/toy.fa -o toy.fa.hfmn.bin -p true
+// interpack encode -f fasta/toy.fa -o toy.fa.hfmn.bin -p true
 // interpack decode -i toy.fa.hfmn.bin -n 2
 
-// time interpack code -f fasta/human_g1k_v37_decoy.fasta -o human_g1k_v37_decoy.fasta.hfmn.bin
+// time interpack encode -f fasta/human_g1k_v37_decoy.fasta -o human_g1k_v37_decoy.fasta.hfmn.bin
 // time interpack decode -i human_g1k_v37_decoy.fasta.hfmn.bin -n 2

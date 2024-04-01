@@ -7,7 +7,7 @@ pub fn configure() -> Command {
         .about("DNA FASTA encoder for compressing raw sequences into searchable binary format")
         .arg_required_else_help(true)
         .subcommand(
-            Command::new("code")
+            Command::new("encode")
                 .about("Encode into searchable binary format")
                 .arg(
                     Arg::new("fasta")
