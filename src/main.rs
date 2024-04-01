@@ -17,20 +17,20 @@ fn main() -> Result<()> {
                 process.1.get_one::<String>("fasta").unwrap().as_str(),
                 process.1.get_one::<String>("output").unwrap().as_str(),
                 *process.1.get_one::<usize>("chunk").unwrap(),
-                *process.1.get_one::<bool>("switch").unwrap()
+                *process.1.get_one::<bool>("switch").unwrap(),
             );
             let _ = compressor.line_by_line(*process.1.get_one::<bool>("print").unwrap());
-        },
+        }
         "decode" => {
-            let decoder = huffman_decode::Extractor::new(process.1.get_one::<String>("input").unwrap().as_str());
+            let decoder = huffman_decode::Extractor::new(
+                process.1.get_one::<String>("input").unwrap().as_str(),
+            );
             let sub_seq = decoder.access(*process.1.get_one::<usize>("number").unwrap())?;
             println!("\n{sub_seq:?}");
-        },
+        }
         _ => {
-            return Err(anyhow::anyhow!(
-                "Invalid process.0"
-            ));
-        },
+            return Err(anyhow::anyhow!("Invalid process.0"));
+        }
     }
 
     Ok(())
