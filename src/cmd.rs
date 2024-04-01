@@ -5,17 +5,17 @@ use clap::{Arg, Command};
 pub fn configure() -> Command {
     Command::new("interpack")
         .about(
-            "DNA FASTA encoder for compressing raw sequences into direct decodable binary format",
+            "DNA FASTA encoder for compressing raw sequences into direct searchable binary format",
         )
         .arg_required_else_help(true)
         .subcommand(
             Command::new("code")
-                .about("Encode into direct decodable binary format")
+                .about("Encode into direct searchable binary format")
                 .arg(
                     Arg::new("fasta")
                         .short('f')
                         .long("fasta")
-                        .help("Sets fasta")
+                        .help("Sets fasta name")
                         .value_parser(clap::value_parser!(String))
                         .required(true),
                 )
@@ -53,7 +53,7 @@ pub fn configure() -> Command {
         )
         .subcommand(
             Command::new("decode")
-                .about("Search for nth sequence from decodable binary format")
+                .about("Search for nth sequence from binary format")
                 .arg(
                     Arg::new("input")
                         .short('i')
