@@ -1,4 +1,5 @@
-use anyhow::{bail, Result};
+use crate::err::MyError;
+use anyhow::Result;
 use memmap2::MmapOptions;
 use std::fs::File;
 
@@ -14,8 +15,10 @@ impl Extractor {
     }
 
     pub fn access(&self, seq_num: usize) -> Result<String> {
-        let file =
-            File::open(self.filename.as_str()).expect("Check path to input searchable binary file");
+        let file = match File::open(self.filename.as_str()) {
+            Ok(file) => file,
+            Err(_) => return Err(MyError::InvalidInputBinary.to_anyhow_error_skip_e()),
+        };
         // Memory map the file
         let mmap = unsafe { MmapOptions::new().map(&file)? };
         let byte_len = mmap.len();
@@ -29,7 +32,7 @@ impl Extractor {
         match mmap[0] {
             239 => two_b_three_b = ('C', 'G'),
             175 => {}
-            _ => panic!("Invalid file to decode"),
+            _ => return Err(MyError::InvalidFileToDecode.to_anyhow_error_skip_e()),
         }
 
         while pos < byte_len {
@@ -39,7 +42,7 @@ impl Extractor {
                 let bit_value = match bit {
                     '0' => 0u8,
                     '1' => 1u8,
-                    _ => bail!("Invalid character in binary sequence"),
+                    _ => return Err(MyError::NotZeroOrOne.to_anyhow_error_skip_e()),
                 };
 
                 packed_byte = (packed_byte << 1) | bit_value;
@@ -54,7 +57,7 @@ impl Extractor {
                             packed_byte = 0u8;
                             sub_pos = 1;
                         }
-                        _ => bail!("Invalid sub_pos"),
+                        _ => return Err(MyError::InvalidSubPos.to_anyhow_error_skip_e()),
                     },
                     1 => match sub_pos {
                         1 => sub_pos = 2,
@@ -65,7 +68,7 @@ impl Extractor {
                             packed_byte = 0u8;
                             sub_pos = 1;
                         }
-                        _ => bail!("Invalid sub_pos"),
+                        _ => return Err(MyError::InvalidSubPos.to_anyhow_error_skip_e()),
                     },
                     2 => {
                         if current_num == seq_num {
@@ -95,7 +98,7 @@ impl Extractor {
                         packed_byte = 0u8;
                         sub_pos = 1;
                     }
-                    _ => panic!("Invalid file to decode"),
+                    _ => return Err(MyError::InvalidFileToDecode.to_anyhow_error_skip_e()),
                 }
             }
 

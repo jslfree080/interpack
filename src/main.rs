@@ -1,6 +1,7 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 use interpack::{
     cmd::configure,
+    err::MyError,
     huffman_decode, huffman_encode,
     util::{cli::Builder, memory_map::LineByLine},
 };
@@ -42,13 +43,13 @@ fn main() -> Result<()> {
             let sub_seq = decoder.access(*process.1.get_one::<usize>("number").unwrap())?;
             println!("{}", sub_seq);
         }
-        _ => bail!("Invalid process.0"),
+        _ => return Err(MyError::InvalidProcessZero.to_anyhow_error()),
     }
 
     Ok(())
 }
 
-// TODO: Add test codes / Handle CLI further / Replace expect, panic!
+// TODO: Add test codes / Handle CLI further
 
 // cargo build --release
 // cargo install --path .

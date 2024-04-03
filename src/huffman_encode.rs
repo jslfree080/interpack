@@ -1,5 +1,6 @@
+use crate::err::MyError;
 use crate::util::memory_map::{self, LineByLine};
-use anyhow::{bail, Result};
+use anyhow::Result;
 use memmap2::MmapOptions;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
@@ -29,7 +30,10 @@ impl Writer {
 
 impl LineByLine for Writer {
     fn line_by_line(&self, print: bool) -> Result<()> {
-        let file = File::open(self.input.as_str()).expect("Check path to input dna fasta file");
+        let file = match File::open(self.input.as_str()) {
+            Ok(file) => file,
+            Err(_) => return Err(MyError::InvalidInputFasta.to_anyhow_error()),
+        };
         let len = file.metadata()?.len();
 
         let output_file = File::create(self.output.as_str())?;
@@ -94,12 +98,12 @@ impl LineByLine for Writer {
                         b'a' | b'A' | b'c' | b'C' | b'g' | b'G' | b't' | b'T' | b'n' | b'N'
                     )) {
                         fs::remove_file(self.output.as_str())?;
-                        panic!(
-                            "Invalid character {} in line{}: {}",
+                        return Err(MyError::InvalidCharacter(
                             *elm_byte as char,
                             line_number,
-                            String::from_utf8_lossy(line)
-                        );
+                            String::from_utf8_lossy(line).to_string(),
+                        )
+                        .to_anyhow_error());
                     }
 
                     if print {
@@ -165,7 +169,7 @@ impl LineByLine for Writer {
                         let bit_value = match bit {
                             '0' => 0u8,
                             '1' => 1u8,
-                            _ => bail!("Invalid character in binary sequence"),
+                            _ => return Err(MyError::NotZeroOrOne.to_anyhow_error()),
                         };
 
                         packed_byte = (packed_byte << 1) | bit_value;
