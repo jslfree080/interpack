@@ -94,7 +94,7 @@ impl LineByLine for Writer {
                         b'a' | b'A' | b'c' | b'C' | b'g' | b'G' | b't' | b'T' | b'n' | b'N'
                     )) {
                         fs::remove_file(self.output.as_str())?;
-                        bail!(
+                        panic!(
                             "Invalid character {} in line{}: {}",
                             *elm_byte as char,
                             line_number,
@@ -165,7 +165,7 @@ impl LineByLine for Writer {
                         let bit_value = match bit {
                             '0' => 0u8,
                             '1' => 1u8,
-                            _ => panic!("Invalid character in binary sequence"),
+                            _ => bail!("Invalid character in binary sequence"),
                         };
 
                         packed_byte = (packed_byte << 1) | bit_value;

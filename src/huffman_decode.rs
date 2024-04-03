@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use memmap2::MmapOptions;
 use std::fs::File;
 
@@ -29,7 +29,7 @@ impl Extractor {
         match mmap[0] {
             239 => two_b_three_b = ('C', 'G'),
             175 => {}
-            _ => return Err(anyhow::anyhow!("Invalid file to decode")),
+            _ => panic!("Invalid file to decode"),
         }
 
         while pos < byte_len {
@@ -39,7 +39,7 @@ impl Extractor {
                 let bit_value = match bit {
                     '0' => 0u8,
                     '1' => 1u8,
-                    _ => panic!("Invalid character in binary sequence"),
+                    _ => bail!("Invalid character in binary sequence"),
                 };
 
                 packed_byte = (packed_byte << 1) | bit_value;
@@ -54,7 +54,7 @@ impl Extractor {
                             packed_byte = 0u8;
                             sub_pos = 1;
                         }
-                        _ => panic!("Invalid sub_pos"),
+                        _ => bail!("Invalid sub_pos"),
                     },
                     1 => match sub_pos {
                         1 => sub_pos = 2,
@@ -65,7 +65,7 @@ impl Extractor {
                             packed_byte = 0u8;
                             sub_pos = 1;
                         }
-                        _ => panic!("Invalid sub_pos"),
+                        _ => bail!("Invalid sub_pos"),
                     },
                     2 => {
                         if current_num == seq_num {
@@ -95,7 +95,7 @@ impl Extractor {
                         packed_byte = 0u8;
                         sub_pos = 1;
                     }
-                    _ => return Err(anyhow::anyhow!("Invalid file to decode")),
+                    _ => panic!("Invalid file to decode"),
                 }
             }
 
