@@ -1,10 +1,10 @@
 use anyhow::Result;
-
 use interpack::{
     cmd::configure,
     huffman_decode, huffman_encode,
     util::{cli::Builder, memory_map::LineByLine},
 };
+use std::path::Path;
 
 fn main() -> Result<()> {
     let cli_builder = Builder::new(configure());
@@ -15,7 +15,18 @@ fn main() -> Result<()> {
         "encode" => {
             let encoder = huffman_encode::Writer::new(
                 process.1.get_one::<String>("fasta").unwrap().as_str(),
-                process.1.get_one::<String>("output").unwrap().as_str(),
+                process
+                    .1
+                    .get_one::<String>("output")
+                    .unwrap_or(&format!(
+                        "{}.hfmn.bin",
+                        Path::new(process.1.get_one::<String>("fasta").unwrap())
+                            .file_name()
+                            .unwrap()
+                            .to_str()
+                            .unwrap()
+                    ))
+                    .as_str(),
                 *process.1.get_one::<usize>("chunk").unwrap(),
                 *process.1.get_one::<bool>("switch").unwrap(),
             );
@@ -36,7 +47,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: Add test codes / CLI (Validate value_parser further / Subcommand isolation / .....) / Further handling
+// TODO: Add test codes / CLI (Validate value_parser further)
 
 // cargo build --release
 // cargo install --path .

@@ -14,7 +14,8 @@ impl Extractor {
     }
 
     pub fn access(&self, seq_num: usize) -> Result<String> {
-        let file = File::open(self.filename.as_str()).expect("File not found");
+        let file =
+            File::open(self.filename.as_str()).expect("Check path to input searchable binary file");
         // Memory map the file
         let mmap = unsafe { MmapOptions::new().map(&file).unwrap() };
         let byte_len = mmap.len();

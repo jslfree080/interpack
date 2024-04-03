@@ -29,7 +29,7 @@ impl Writer {
 
 impl LineByLine for Writer {
     fn line_by_line(&self, print: bool) -> Result<()> {
-        let file = File::open(self.input.as_str()).expect("File not found");
+        let file = File::open(self.input.as_str()).expect("Check path to input dna fasta file");
         let len = file.metadata()?.len();
 
         let output_file = File::create(self.output.as_str())?;
