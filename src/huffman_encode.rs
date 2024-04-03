@@ -1,9 +1,13 @@
-use crate::err::MyError;
-use crate::util::memory_map::{self, LineByLine};
+use crate::{
+    err::MyError,
+    util::memory_map::{self, LineByLine},
+};
 use anyhow::Result;
 use memmap2::MmapOptions;
-use std::fs::{self, File};
-use std::io::{BufWriter, Write};
+use std::{
+    fs::{self, File},
+    io::{BufWriter, Write},
+};
 
 pub struct Writer {
     input: String,
