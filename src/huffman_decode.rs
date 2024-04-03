@@ -17,7 +17,7 @@ impl Extractor {
         let file =
             File::open(self.filename.as_str()).expect("Check path to input searchable binary file");
         // Memory map the file
-        let mmap = unsafe { MmapOptions::new().map(&file).unwrap() };
+        let mmap = unsafe { MmapOptions::new().map(&file)? };
         let byte_len = mmap.len();
 
         let mut sub_seq = String::with_capacity(byte_len * 4);
