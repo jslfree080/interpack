@@ -1,5 +1,5 @@
 use crate::util::memory_map::{self, LineByLine};
-use anyhow::Result;
+use anyhow::{bail, Result};
 use memmap2::MmapOptions;
 use std::fs::{self, File};
 use std::io::{BufWriter, Write};
@@ -94,12 +94,12 @@ impl LineByLine for Writer {
                         b'a' | b'A' | b'c' | b'C' | b'g' | b'G' | b't' | b'T' | b'n' | b'N'
                     )) {
                         fs::remove_file(self.output.as_str())?;
-                        return Err(anyhow::anyhow!(
+                        bail!(
                             "Invalid character {} in line{}: {}",
                             *elm_byte as char,
                             line_number,
                             String::from_utf8_lossy(line)
-                        ));
+                        );
                     }
 
                     if print {

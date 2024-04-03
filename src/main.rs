@@ -31,6 +31,9 @@ fn main() -> Result<()> {
                 *process.1.get_one::<bool>("switch").unwrap(),
             );
             let _ = encoder.line_by_line(*process.1.get_one::<bool>("print").unwrap());
+            if *process.1.get_one::<bool>("print").unwrap() as bool {
+                println!()
+            }
         }
         "decode" => {
             let decoder = huffman_decode::Extractor::new(
@@ -47,7 +50,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: Add test codes / Handle CLI further
+// TODO: Add test codes / Handle CLI further / Error handling
 
 // cargo build --release
 // cargo install --path .
