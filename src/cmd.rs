@@ -13,7 +13,7 @@ pub fn configure() -> Command {
                     Arg::new("fasta")
                         .short('f')
                         .long("fasta")
-                        .help("Specify the fasta name")
+                        .help("Specify path to input dna fasta file")
                         .value_parser(clap::value_parser!(String))
                         .required(true),
                 )
@@ -21,14 +21,14 @@ pub fn configure() -> Command {
                     Arg::new("output")
                         .short('o')
                         .long("output")
-                        .help("Specify the output binary name")
+                        .help("Specify path to output binary file")
                         .value_parser(clap::value_parser!(String)),
                 )
                 .arg(
                     Arg::new("chunk")
                         .short('c')
                         .long("chunk")
-                        .help("Specify chunk")
+                        .help("Specify chunk size to memory map a file for reading")
                         .value_parser(clap::value_parser!(usize))
                         .default_value("67108864"),
                 )
@@ -36,7 +36,7 @@ pub fn configure() -> Command {
                     Arg::new("switch")
                         .short('s')
                         .long("switch")
-                        .help("Switch the 3-bit encoded base from C to G")
+                        .help("Switch 3-bit encoded base from C to G")
                         .value_parser(clap::value_parser!(bool))
                         .default_value("false"),
                 )
@@ -44,19 +44,19 @@ pub fn configure() -> Command {
                     Arg::new("print")
                         .short('p')
                         .long("print")
-                        .help("Print the encoding")
+                        .help("Print raw sequences with its encoding")
                         .value_parser(clap::value_parser!(bool))
                         .default_value("false"),
                 ),
         )
         .subcommand(
             Command::new("decode")
-                .about("Search for nth sequence from searchable binary file")
+                .about("Extract nth sequence from searchable binary format")
                 .arg(
-                    Arg::new("input")
-                        .short('i')
-                        .long("input")
-                        .help("Specify searchable binary file")
+                    Arg::new("binary")
+                        .short('b')
+                        .long("binary")
+                        .help("Specify path to input searchable binary file")
                         .value_parser(clap::value_parser!(String))
                         .required(true),
                 )
@@ -64,7 +64,7 @@ pub fn configure() -> Command {
                     Arg::new("number")
                         .short('n')
                         .long("number")
-                        .help("Specify nth sequence")
+                        .help("Specify nth sequence to extract")
                         .value_parser(clap::value_parser!(usize))
                         .required(true),
                 ),
