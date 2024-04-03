@@ -48,7 +48,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: Add test codes / Handle CLI further / Substitute expect, panic!
+// TODO: Add test codes / Handle CLI further / Replace expect, panic!
 
 // cargo build --release
 // cargo install --path .
