@@ -42,7 +42,7 @@ fn main() -> Result<()> {
 // cargo install --path .
 
 // interpack encode -f fasta/toy.fa -o toy.fa.hfmn.bin -p true
-// interpack decode -b toy.fa.hfmn.bin -n 2
+// interpack decode -b toy.fa.hfmn.bin -n 2 // Extract second sequence from fasta/toy.fa
 
 // time interpack encode -f fasta/human_g1k_v37_decoy.fasta -o human_g1k_v37_decoy.fasta.hfmn.bin
 // time interpack decode -b human_g1k_v37_decoy.fasta.hfmn.bin -n 7 > human_g1k_v37_decoy_seventh_sequence.txt
