@@ -47,7 +47,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: Add test codes / CLI (Validate value_parser further)
+// TODO: Add test codes / Handle CLI further
 
 // cargo build --release
 // cargo install --path .
@@ -55,5 +55,5 @@ fn main() -> Result<()> {
 // interpack encode -f fasta/toy.fa -o toy.fa.hfmn.bin -p true
 // interpack decode -b toy.fa.hfmn.bin -n 2 // Extract second sequence from fasta/toy.fa
 
-// time interpack encode -f fasta/human_g1k_v37_decoy.fasta -o human_g1k_v37_decoy.fasta.hfmn.bin
+// time interpack encode -f fasta/human_g1k_v37_decoy.fasta
 // time interpack decode -b human_g1k_v37_decoy.fasta.hfmn.bin -n 7 > human_g1k_v37_decoy_seventh_sequence.txt

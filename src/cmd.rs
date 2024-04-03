@@ -1,6 +1,5 @@
 use clap::{Arg, Command};
 
-// TODO: Validate value_parser further
 pub fn configure() -> Command {
     Command::new("interpack")
         .about("DNA FASTA encoder for compressing raw sequences into searchable binary format")
@@ -28,7 +27,7 @@ pub fn configure() -> Command {
                         .short('c')
                         .long("chunk")
                         .help("Specify chunk size to memory map a file for reading")
-                        .value_parser(clap::value_parser!(usize))
+                        .value_parser(parse_encode_chunk)
                         .default_value("67108864"),
                 )
                 .arg(
@@ -64,8 +63,30 @@ pub fn configure() -> Command {
                         .short('n')
                         .long("number")
                         .help("Specify nth sequence to extract")
-                        .value_parser(clap::value_parser!(usize))
+                        .value_parser(parse_decode_number)
                         .required(true),
                 ),
         )
+}
+
+fn parse_encode_chunk(val: &str) -> Result<usize, String> {
+    let encode_chunk = val
+        .parse::<usize>()
+        .map_err(|_| "Chunk size must be an unsigned integer".to_string())?;
+    if encode_chunk >= 67108864 {
+        Ok(encode_chunk)
+    } else {
+        Err("Chunk size must be at least 67108864 (64MB)".to_string())
+    }
+}
+
+fn parse_decode_number(val: &str) -> Result<usize, String> {
+    let decode_number = val
+        .parse::<usize>()
+        .map_err(|_| "Sequence number must be an unsigned integer".to_string())?;
+    if decode_number >= 1 {
+        Ok(decode_number)
+    } else {
+        Err("Sequence number must be at least 1".to_string())
+    }
 }
