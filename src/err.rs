@@ -22,6 +22,15 @@ pub enum MyError {
 
     #[error("Invalid process.0")]
     InvalidProcessZero,
+
+    #[error("Start position should be smaller than end position")]
+    InvalidDecodeRange,
+
+    #[error("Start position should not be larger than length of nth sequence")]
+    InvalidDecodeStart,
+
+    #[error("End position should not be larger than length of nth sequence")]
+    InvalidDecodeEnd,
 }
 
 impl MyError {

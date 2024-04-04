@@ -65,6 +65,20 @@ pub fn configure() -> Command {
                         .help("Specify nth sequence to extract")
                         .value_parser(parse_decode_number)
                         .required(true),
+                )
+                .arg(
+                    Arg::new("start")
+                        .short('s')
+                        .long("start")
+                        .help("Specify sth base from nth sequence to start")
+                        .value_parser(parse_decode_number),
+                )
+                .arg(
+                    Arg::new("end")
+                        .short('e')
+                        .long("end")
+                        .help("Specify eth base from nth sequence to end")
+                        .value_parser(parse_decode_number),
                 ),
         )
 }
