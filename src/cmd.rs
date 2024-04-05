@@ -104,3 +104,34 @@ fn parse_decode_number(val: &str) -> Result<usize, String> {
         Err("Sequence number must be at least 1".to_string())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_encode_chunk() {
+        assert_eq!(parse_encode_chunk("67108864").unwrap(), 67108864);
+        assert_eq!(
+            parse_encode_chunk("67108864.5"),
+            Err("Chunk size must be an unsigned integer".to_string())
+        );
+        assert_eq!(
+            parse_encode_chunk("67108863"),
+            Err("Chunk size must be at least 67108864 (64MB)".to_string())
+        );
+    }
+
+    #[test]
+    fn test_parse_decode_number() {
+        assert_eq!(parse_decode_number("10").unwrap(), 10);
+        assert_eq!(
+            parse_decode_number("10.5"),
+            Err("Sequence number must be an unsigned integer".to_string())
+        );
+        assert_eq!(
+            parse_decode_number("0"),
+            Err("Sequence number must be at least 1".to_string())
+        );
+    }
+}
