@@ -40,7 +40,7 @@ impl LineByLine for Writer {
         };
         let len = file.metadata()?.len();
 
-        let output_file = File::create(self.output.as_str())?;
+        let output_file = File::create(format!("{}.hfmn.bin", self.output).as_str())?;
         // Using BufWriter with less frequency of manual flushing mitigate the performance overhead
         let mut buffered_output_file = BufWriter::new(output_file);
         let (mut packed_byte, mut remaining_bits) = (0u8, 8u8);

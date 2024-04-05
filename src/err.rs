@@ -31,6 +31,9 @@ pub enum MyError {
 
     #[error("End position should not be larger than length of nth sequence")]
     InvalidDecodeEnd,
+
+    #[error("No such directory exists")]
+    InvalidDirectory,
 }
 
 impl MyError {

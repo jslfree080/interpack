@@ -19,7 +19,7 @@ pub fn configure() -> Command {
                     Arg::new("output")
                         .short('o')
                         .long("output")
-                        .help("Specify path to output binary file")
+                        .help("Specify directory to output binary file")
                         .value_parser(clap::value_parser!(String)),
                 )
                 .arg(

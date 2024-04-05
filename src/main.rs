@@ -5,7 +5,7 @@ use interpack::{
     huffman_decode, huffman_encode,
     util::{cli::Builder, memory_map::LineByLine},
 };
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 fn main() -> Result<()> {
     let cli_builder = Builder::new(configure());
@@ -14,20 +14,28 @@ fn main() -> Result<()> {
 
     match process.0 {
         "encode" => {
+            let fasta_name = Path::new(process.1.get_one::<String>("fasta").unwrap())
+                .file_name()
+                .unwrap()
+                .to_str()
+                .unwrap();
+
+            let output_str = match process.1.get_one::<String>("output") {
+                Some(val) => match Path::new(val).exists() {
+                    true => {
+                        let mut path = PathBuf::new();
+                        path.push(val);
+                        path.push(fasta_name);
+                        path.to_str().unwrap().to_string()
+                    }
+                    false => return Err(MyError::InvalidDirectory.to_anyhow_error_skip_e()),
+                },
+                None => fasta_name.to_string(),
+            };
+
             let encoder = huffman_encode::Writer::new(
                 process.1.get_one::<String>("fasta").unwrap().as_str(),
-                process
-                    .1
-                    .get_one::<String>("output")
-                    .unwrap_or(&format!(
-                        "{}.hfmn.bin",
-                        Path::new(process.1.get_one::<String>("fasta").unwrap())
-                            .file_name()
-                            .unwrap()
-                            .to_str()
-                            .unwrap()
-                    ))
-                    .as_str(),
+                output_str.as_str(),
                 *process.1.get_one::<usize>("chunk").unwrap(),
                 *process.1.get_one::<bool>("switch").unwrap(),
             );
@@ -78,12 +86,12 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: Add test codes / Handle CLI further
+// TODO: Add test codes
 
 // cargo build --release
 // cargo install --path .
 
-// interpack encode -f fasta/toy.fa -o toy.fa.hfmn.bin -p true
+// interpack encode -f fasta/toy.fa -p true
 // interpack decode -b toy.fa.hfmn.bin -n 2 // Extract second sequence from fasta/toy.fa
 // interpack decode -b toy.fa.hfmn.bin -n 2 -s 5 // Extract second sequence from 5th to end
 // interpack decode -b toy.fa.hfmn.bin -n 2 -e 10 // Extract second sequence from start to 10th
