@@ -44,22 +44,12 @@ impl Extractor {
                 packed_byte = (packed_byte << 1) | bit_value;
 
                 match packed_byte {
-                    0 => match sub_pos {
+                    0 | 1 => match sub_pos {
                         1 => sub_pos = 2,
                         2 => {
+                            let nucleotide = if packed_byte == 0 { 'A' } else { 'T' };
                             if current_num == seq_num {
-                                sub_seq.push('A');
-                            }
-                            packed_byte = 0u8;
-                            sub_pos = 1;
-                        }
-                        _ => return Err(MyError::InvalidSubPos.to_anyhow_error_skip_e()),
-                    },
-                    1 => match sub_pos {
-                        1 => sub_pos = 2,
-                        2 => {
-                            if current_num == seq_num {
-                                sub_seq.push('T');
+                                sub_seq.push(nucleotide);
                             }
                             packed_byte = 0u8;
                             sub_pos = 1;
@@ -73,7 +63,7 @@ impl Extractor {
                         packed_byte = 0u8;
                         sub_pos = 1;
                     }
-                    3 => {}
+                    3 | 7 => {}
                     6 => {
                         if current_num == seq_num {
                             sub_seq.push(two_b_three_b.1);
@@ -81,7 +71,6 @@ impl Extractor {
                         packed_byte = 0u8;
                         sub_pos = 1;
                     }
-                    7 => {}
                     14 => {
                         if current_num == seq_num {
                             sub_seq.push('N');
