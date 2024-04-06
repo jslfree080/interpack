@@ -5,9 +5,6 @@ pub enum MyError {
     #[error("Invalid character {0} in line {1}: {2}")]
     InvalidCharacter(char, usize, String),
 
-    #[error("Invalid character in binary sequence")]
-    NotZeroOrOne,
-
     #[error("Check path to input dna fasta file")]
     InvalidInputFasta,
 
