@@ -1,1 +1,2 @@
-<img alt="Using BufWriter with less frequency of manual flushing mitigate the performance overhead" src="https://github.com/jslfree080/interpack/blob/master/flamegraph.svg" width=1000>
+<img alt="huffman_encode.rs" src="https://github.com/jslfree080/interpack/blob/master/flamegraph_encode.svg" width=1000>
+<img alt="huffman_decode.rs" src="https://github.com/jslfree080/interpack/blob/master/flamegraph_decode.svg" width=1000>
