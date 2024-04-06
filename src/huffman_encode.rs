@@ -124,57 +124,40 @@ impl LineByLine for Writer {
                                     + (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
                                     + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
                                     + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
-                                width = match self.g_is_three_bit {
-                                    true => match *elm_byte {
-                                        b'a' | b'A' | b'c' | b'C' | b't' | b'T' => 2,
-                                        b'g' | b'G' => 3,
-                                        b'n' | b'N' => 4,
-                                        _ => 0,
-                                    },
-                                    false => match *elm_byte {
-                                        b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
-                                        b'c' | b'C' => 3,
-                                        b'n' | b'N' => 4,
-                                        _ => 0,
-                                    },
+                                width = match (self.g_is_three_bit, *elm_byte) {
+                                    (true, b'a' | b'A' | b'c' | b'C' | b't' | b'T') => 2,
+                                    (true, b'g' | b'G') => 3,
+                                    (true, b'n' | b'N') => 4,
+                                    (false, b'a' | b'A' | b'g' | b'G' | b't' | b'T') => 2,
+                                    (false, b'c' | b'C') => 3,
+                                    (false, b'n' | b'N') => 4,
+                                    _ => 0,
                                 }
                             )
                         );
                     }
 
-                    for bit in format!(
-                        "{:0width$b}",
-                        // (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
-                        //     +
-                        (c_g_encode_pair.0
-                            * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
-                                & (*elm_byte & 1u8)
-                                & 1u8))
-                            + (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
-                            + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
-                            + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
-                        width = match self.g_is_three_bit {
-                            true => match *elm_byte {
-                                b'a' | b'A' | b'c' | b'C' | b't' | b'T' => 2,
-                                b'g' | b'G' => 3,
-                                b'n' | b'N' => 4,
-                                _ => 0,
-                            },
-                            false => match *elm_byte {
-                                b'a' | b'A' | b'g' | b'G' | b't' | b'T' => 2,
-                                b'c' | b'C' => 3,
-                                b'n' | b'N' => 4,
-                                _ => 0,
-                            },
-                        }
-                    )
-                    .chars()
-                    {
-                        let bit_value = match bit {
-                            '0' => 0u8,
-                            '1' => 1u8,
-                            _ => return Err(MyError::NotZeroOrOne.to_anyhow_error()),
-                        };
+                    let encoded = (c_g_encode_pair.0
+                        * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
+                            & (*elm_byte & 1u8)
+                            & 1u8))
+                        + (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
+                        + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
+                        + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8));
+                    // + (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
+
+                    let width = match (self.g_is_three_bit, *elm_byte) {
+                        (true, b'a' | b'A' | b'c' | b'C' | b't' | b'T') => 2,
+                        (true, b'g' | b'G') => 3,
+                        (true, b'n' | b'N') => 4,
+                        (false, b'a' | b'A' | b'g' | b'G' | b't' | b'T') => 2,
+                        (false, b'c' | b'C') => 3,
+                        (false, b'n' | b'N') => 4,
+                        _ => 0,
+                    };
+
+                    for bit_pos in (0..width).rev() {
+                        let bit_value = (encoded >> bit_pos) & 1u8;
 
                         packed_byte = (packed_byte << 1) | bit_value;
                         remaining_bits -= 1u8;
