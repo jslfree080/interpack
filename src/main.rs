@@ -89,13 +89,13 @@ fn main() -> Result<()> {
 // TODO: Add test codes
 
 // cargo build --release
-// cargo install --path .
+// cargo install --path . --locked
 
-// interpack encode -f fasta/toy.fa -p true
-// interpack decode -b toy.fa.hfmn.bin -n 2 // Extract second sequence from fasta/toy.fa
+// interpack encode -f fasta/toy.fa -p true // Compress into toy.fa.hfmn.bin with encoding printed
+// interpack decode -b toy.fa.hfmn.bin -n 2 // Extract second sequence from toy.fa
 // interpack decode -b toy.fa.hfmn.bin -n 2 -s 5 // Extract second sequence from 5th to end
 // interpack decode -b toy.fa.hfmn.bin -n 2 -e 10 // Extract second sequence from start to 10th
 
-// time interpack encode -f fasta/human_g1k_v37_decoy.fasta
+// time interpack encode -f fasta/human_g1k_v37_decoy.fasta // Compress into human_g1k_v37_decoy.fasta.hfmn.bin without print
 // time interpack decode -b human_g1k_v37_decoy.fasta.hfmn.bin -n 1 -s 10001 -e 10100 // Extract first sequence from 10001th to 10100th
 // time interpack decode -b human_g1k_v37_decoy.fasta.hfmn.bin -n 7 > human_g1k_v37_decoy_seventh_sequence.txt
