@@ -36,14 +36,10 @@ impl Extractor {
         }
 
         while pos < byte_len {
-            let sub_mmap = format!("{:08b}", &mmap[pos]);
+            let sub_mmap = mmap[pos];
 
-            for bit in sub_mmap.chars() {
-                let bit_value = match bit {
-                    '0' => 0u8,
-                    '1' => 1u8,
-                    _ => return Err(MyError::NotZeroOrOne.to_anyhow_error_skip_e()),
-                };
+            for bit_pos in (0..8).rev() {
+                let bit_value = (sub_mmap >> bit_pos) & 1u8;
 
                 packed_byte = (packed_byte << 1) | bit_value;
 
