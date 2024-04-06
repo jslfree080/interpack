@@ -86,8 +86,8 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: Add test codes
-
+// git clone https://github.com/jslfree080/interpack.git
+// cd interpack
 // cargo build --release
 // cargo install --path . --locked
 
