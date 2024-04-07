@@ -9,7 +9,7 @@ edition = "2021"
 [dependencies]
 memmap2 = "0.9.4"
 anyhow = "1.0"
-clap = "4.5.4"
+clap = {version = "4.5.4", features = ["cargo"]}
 thiserror = "1.0.58"
 
 [profile.release]

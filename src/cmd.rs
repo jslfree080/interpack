@@ -1,8 +1,13 @@
-use clap::{Arg, Command};
+use clap::{crate_authors, crate_description, crate_version, Arg, Command};
 
 pub fn configure() -> Command {
     Command::new("interpack")
-        .about("DNA FASTA encoder for compressing raw sequences into searchable binary format")
+        .version(crate_version!())
+        .author(crate_authors!())
+        .about(crate_description!())
+        .help_template(
+            "\n\n{name} {version}\n{author}\n{about}\n\n{usage-heading} {usage}\n\n{all-args}",
+        )
         .arg_required_else_help(true)
         .subcommand(
             Command::new("encode")
