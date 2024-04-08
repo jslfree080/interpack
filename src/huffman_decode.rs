@@ -23,7 +23,8 @@ impl Extractor {
         let mmap = unsafe { MmapOptions::new().map(&file)? };
         let byte_len = mmap.len();
 
-        let mut sub_seq = String::with_capacity(byte_len * 4);
+        // (1+x+1) bytes can handle 4x bases
+        let mut sub_seq = String::with_capacity(byte_len << 2);
         let mut packed_byte = 0u8;
 
         let (mut pos, mut current_num, mut sub_pos) = (1, 1, 1);
