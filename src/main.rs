@@ -86,8 +86,6 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: Adjust sequence separation for random access
-
 // git clone https://github.com/jslfree080/interpack.git
 // cd interpack
 // cargo build --release

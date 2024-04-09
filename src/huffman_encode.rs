@@ -5,6 +5,7 @@ use crate::{
 use anyhow::Result;
 use memmap2::MmapOptions;
 use std::{
+    collections::BTreeMap,
     fs::{self, File},
     io::{BufWriter, Write},
 };
@@ -53,6 +54,10 @@ impl LineByLine for Writer {
             false => (0b110u8, 0b10u8),
         };
 
+        // Enables random access for decode
+        let (mut packed_byte_count, mut pbc_remaining_bits) =
+            (1usize, BTreeMap::<usize, u8>::new());
+
         while pos < len {
             // Calculate the size of the chunk to map
             let remaining_bytes = len - pos;
@@ -77,6 +82,8 @@ impl LineByLine for Writer {
             }
 
             if !line.is_empty() && line[0] != b'>' {
+                pbc_remaining_bits.insert(packed_byte_count, 8 - (remaining_bits % 8));
+
                 for mut elm_byte in line {
                     match elm_byte {
                         // Ambiguous codes commonly used in DNA sequences
@@ -163,6 +170,7 @@ impl LineByLine for Writer {
                         remaining_bits -= 1u8;
 
                         if remaining_bits == 0u8 {
+                            packed_byte_count += 1;
                             buffered_output_file.write_all(&[packed_byte])?;
                             packed_byte = 0u8;
                             remaining_bits = 8u8;
@@ -190,6 +198,7 @@ impl LineByLine for Writer {
                         remaining_bits -= 1u8;
 
                         if remaining_bits == 0u8 {
+                            packed_byte_count += 1;
                             buffered_output_file.write_all(&[packed_byte])?;
                             // Manual flushing
                             buffered_output_file.flush()?;
@@ -211,6 +220,7 @@ impl LineByLine for Writer {
             remaining_bits -= 1u8;
 
             if remaining_bits == 0u8 {
+                packed_byte_count += 1;
                 buffered_output_file.write_all(&[packed_byte])?;
                 // Manual flushing
                 buffered_output_file.flush()?;
@@ -218,6 +228,21 @@ impl LineByLine for Writer {
                 remaining_bits = 8u8;
             }
         }
+
+        // Separation between sequence and index with 0b11111111
+        buffered_output_file.write_all(&[0b11111111u8])?;
+        // Manual flushing
+        buffered_output_file.flush()?;
+
+        // Enables random access for decode
+        for (pbc, rb) in &pbc_remaining_bits {
+            buffered_output_file.write_all(pbc.to_string().as_bytes())?;
+            buffered_output_file.write_all(&[*rb])?;
+            // Manual flushing
+            buffered_output_file.flush()?;
+        }
+
+        println!("{:?}", pbc_remaining_bits);
 
         Ok(())
     }

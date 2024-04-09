@@ -1,7 +1,7 @@
 use crate::err::MyError;
 use anyhow::Result;
 use memmap2::MmapOptions;
-use std::fs::File;
+use std::{collections::BTreeMap, fs::File};
 
 pub struct Extractor {
     filename: String,
@@ -27,7 +27,7 @@ impl Extractor {
         let mut sub_seq = String::with_capacity(byte_len << 2);
         let mut packed_byte = 0u8;
 
-        let (mut pos, mut current_num, mut sub_pos) = (1, 1, 1);
+        let (mut current_num, mut sub_pos) = (1, 1);
 
         let mut two_b_three_b = ('G', 'C');
         match mmap[0] {
@@ -36,10 +36,58 @@ impl Extractor {
             _ => return Err(MyError::InvalidFileToDecode.to_anyhow_error_skip_e()),
         }
 
-        while pos < byte_len {
-            let sub_mmap = mmap[pos];
+        if (mmap[byte_len - 1] < 1) || (mmap[byte_len - 1] > 8) {
+            return Err(MyError::InvalidFileToDecode.to_anyhow_error_skip_e());
+        }
+        let (
+            mut pbc_remaining_bits,
+            mut exp,
+            mut pbc_io_insert,
+            mut rb_to_insert,
+            mut index_reader,
+        ) = (BTreeMap::<usize, u8>::new(), 0, 0usize, 8u8, byte_len - 1);
+        loop {
+            if mmap[index_reader] == 255 {
+                pbc_remaining_bits.insert(pbc_io_insert, rb_to_insert);
+                break;
+            }
 
-            for bit_pos in (0..8).rev() {
+            if (mmap[index_reader] >= 1) && (mmap[index_reader] <= 8) {
+                if index_reader < byte_len - 1 {
+                    pbc_remaining_bits.insert(pbc_io_insert, rb_to_insert);
+                    exp = 0;
+                    pbc_io_insert = 0usize;
+                }
+                rb_to_insert = mmap[index_reader];
+            }
+
+            if (mmap[index_reader] >= 48) && (mmap[index_reader] <= 57) {
+                pbc_io_insert += (mmap[index_reader] - 48) as usize * 10usize.pow(exp);
+                exp += 1;
+            }
+
+            index_reader -= 1;
+        }
+
+        if seq_num > pbc_remaining_bits.len() {
+            return Err(MyError::InvalidSequenceNumber.to_anyhow_error_skip_e());
+        }
+        let (mut pbc_rb_pos, mut pbc_start_pos, mut rb_start_bit_pos) = (1, 1, 8u8);
+        for (pbc, rb) in pbc_remaining_bits {
+            if pbc_rb_pos == seq_num {
+                (pbc_start_pos, rb_start_bit_pos) = (pbc, rb);
+                break;
+            }
+
+            pbc_rb_pos += 1;
+        }
+
+        let mut bit_pos_range = (0..rb_start_bit_pos).rev();
+
+        while pbc_start_pos < byte_len {
+            let sub_mmap = mmap[pbc_start_pos];
+
+            for bit_pos in bit_pos_range {
                 let bit_value = (sub_mmap >> bit_pos) & 1u8;
 
                 packed_byte = (packed_byte << 1) | bit_value;
@@ -92,7 +140,8 @@ impl Extractor {
                 break;
             }
 
-            pos += 1;
+            pbc_start_pos += 1;
+            bit_pos_range = (0..8).rev();
         }
 
         Ok(sub_seq)

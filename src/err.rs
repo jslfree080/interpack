@@ -20,6 +20,9 @@ pub enum MyError {
     #[error("Invalid process.0")]
     InvalidProcessZero,
 
+    #[error("Sequence number should not exceed the total number of sequences")]
+    InvalidSequenceNumber,
+
     #[error("Start position should be smaller than end position")]
     InvalidDecodeRange,
 
