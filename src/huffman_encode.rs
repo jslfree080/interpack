@@ -242,8 +242,6 @@ impl LineByLine for Writer {
             buffered_output_file.flush()?;
         }
 
-        println!("{:?}", pbc_remaining_bits);
-
         Ok(())
     }
 }
