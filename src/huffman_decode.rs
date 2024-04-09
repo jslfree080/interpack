@@ -73,6 +73,8 @@ impl Extractor {
             index_reader -= 1;
         }
 
+        println!("{:?}", pbc_remaining_bits);
+
         if seq_num > pbc_remaining_bits.len() {
             return Err(MyError::InvalidSequenceNumber.to_anyhow_error_skip_e());
         }

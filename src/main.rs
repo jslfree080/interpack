@@ -86,7 +86,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-// TODO: fix bugs for decode
+// TODO: fix bugs for encode
 
 // git clone https://github.com/jslfree080/interpack.git
 // cd interpack
