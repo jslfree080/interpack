@@ -27,7 +27,11 @@ impl Extractor {
         let mut sub_seq = String::with_capacity(byte_len << 2);
         let mut packed_byte = 0u8;
 
-        let (mut current_num, mut sub_pos) = (1, 1);
+        let mut count_1111 = match seq_num {
+            1 => 1,
+            _ => 0,
+        };
+        let mut sub_pos = 1;
 
         let mut two_b_three_b = ('G', 'C');
         match mmap[0] {
@@ -82,10 +86,11 @@ impl Extractor {
             pbc_rb_pos += 1;
         }
 
+        let mut pbc_pos = pbc_start_pos;
         let mut bit_pos_range = (0..rb_start_bit_pos).rev();
 
-        while pbc_start_pos < byte_len {
-            let sub_mmap = mmap[pbc_start_pos];
+        while pbc_pos < byte_len {
+            let sub_mmap = mmap[pbc_pos];
 
             for bit_pos in bit_pos_range {
                 let bit_value = (sub_mmap >> bit_pos) & 1u8;
@@ -97,7 +102,7 @@ impl Extractor {
                         1 => sub_pos = 2,
                         2 => {
                             let nucleotide = if packed_byte == 0 { 'A' } else { 'T' };
-                            if current_num == seq_num {
+                            if count_1111 == 1 {
                                 sub_seq.push(nucleotide);
                             }
                             packed_byte = 0u8;
@@ -106,7 +111,7 @@ impl Extractor {
                         _ => return Err(MyError::InvalidSubPos.to_anyhow_error_skip_e()),
                     },
                     2 => {
-                        if current_num == seq_num {
+                        if count_1111 == 1 {
                             sub_seq.push(two_b_three_b.0);
                         }
                         packed_byte = 0u8;
@@ -114,21 +119,21 @@ impl Extractor {
                     }
                     3 | 7 => {}
                     6 => {
-                        if current_num == seq_num {
+                        if count_1111 == 1 {
                             sub_seq.push(two_b_three_b.1);
                         }
                         packed_byte = 0u8;
                         sub_pos = 1;
                     }
                     14 => {
-                        if current_num == seq_num {
+                        if count_1111 == 1 {
                             sub_seq.push('N');
                         }
                         packed_byte = 0u8;
                         sub_pos = 1;
                     }
                     15 => {
-                        current_num += 1;
+                        count_1111 += 1;
                         packed_byte = 0u8;
                         sub_pos = 1;
                     }
@@ -136,11 +141,11 @@ impl Extractor {
                 }
             }
 
-            if current_num > seq_num {
+            if count_1111 == 2 {
                 break;
             }
 
-            pbc_start_pos += 1;
+            pbc_pos += 1;
             bit_pos_range = (0..8).rev();
         }
 

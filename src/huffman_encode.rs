@@ -82,8 +82,6 @@ impl LineByLine for Writer {
             }
 
             if !line.is_empty() && line[0] != b'>' {
-                pbc_remaining_bits.insert(packed_byte_count, 8 - (remaining_bits % 8));
-
                 for mut elm_byte in line {
                     match elm_byte {
                         // Ambiguous codes commonly used in DNA sequences
@@ -184,6 +182,8 @@ impl LineByLine for Writer {
             }
 
             if !line.is_empty() && line[0] == b'>' {
+                pbc_remaining_bits.insert(packed_byte_count, 8 - (remaining_bits % 8));
+
                 if line_number == 1 {
                     match self.g_is_three_bit {
                         true => buffered_output_file.write_all(&[0b11101111u8])?,
