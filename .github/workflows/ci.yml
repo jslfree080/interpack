@@ -30,7 +30,7 @@ jobs:
     needs: setup
     steps:
       - name: Check code formatting
-        run: cargo fmt -- --check
+        run: cargo fmt -- --check --manifest-path Cargo.toml
 
   lint:
     runs-on: ubuntu-latest
@@ -46,4 +46,4 @@ jobs:
     needs: setup
     steps:
       - name: Run tests
-        run: cargo test
+        run: cargo test --manifest-path Cargo.toml
