@@ -18,7 +18,12 @@ jobs:
         with:
           toolchain: stable
           override: true
-          components: rustfmt clippy
+          
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+  
+      - name: Install clippy
+        run: rustup component add clippy
 
   format:
     runs-on: ubuntu-latest
