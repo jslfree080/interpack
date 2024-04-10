@@ -69,11 +69,22 @@ impl LineByLine for Writer {
             // Find the end of the current line
             let next_newline = mmap
                 .iter()
-                .position(|&c| c == b'\n')
-                .map(|i| i + 1)
+                .position(|&c| c == b'\n' || c == b'\r') // Check for both '\n' and '\r'
+                .map(|i| {
+                    if mmap.get(i) == Some(&b'\r') && mmap.get(i + 1) == Some(&b'\n') {
+                        i + 2 // If '\r\n', skip both characters
+                    } else {
+                        i + 1 // If '\n' or '\r' only, skip the newline character
+                    }
+                })
                 .unwrap_or(chunk);
 
-            let line = &mmap[..next_newline - 1]; // Exclude the newline character
+            // Extract the line, excluding the newline character(s)
+            let line = if let Some(&b'\r') = mmap.get(next_newline - 2) {
+                &mmap[..next_newline - 2] // If '\r\n', exclude both '\r' and '\n'
+            } else {
+                &mmap[..next_newline - 1] // If '\n' or '\r' only, exclude only the newline character
+            };
 
             // Process the line
             if print {
