@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Check with Clippy
         uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   test:
     runs-on: ubuntu-latest
