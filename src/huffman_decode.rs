@@ -27,10 +27,6 @@ impl Extractor {
         let mut sub_seq = String::with_capacity(byte_len << 2);
         let mut packed_byte = 0u8;
 
-        let mut count_1111 = match seq_num {
-            1 => 1,
-            _ => 0,
-        };
         let mut sub_pos = 1;
 
         let mut two_b_three_b = ('G', 'C');
@@ -87,6 +83,8 @@ impl Extractor {
 
             pbc_rb_pos += 1;
         }
+
+        let mut count_1111 = 1;
 
         let mut pbc_pos = pbc_start_pos;
         let mut bit_pos_range = (0..rb_start_bit_pos).rev();

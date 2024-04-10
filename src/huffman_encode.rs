@@ -182,8 +182,6 @@ impl LineByLine for Writer {
             }
 
             if !line.is_empty() && line[0] == b'>' {
-                pbc_remaining_bits.insert(packed_byte_count, 8 - (remaining_bits % 8));
-
                 if line_number == 1 {
                     match self.g_is_three_bit {
                         true => buffered_output_file.write_all(&[0b11101111u8])?,
@@ -207,6 +205,8 @@ impl LineByLine for Writer {
                         }
                     }
                 }
+
+                pbc_remaining_bits.insert(packed_byte_count, remaining_bits);
             }
 
             // Move to the next line
@@ -241,6 +241,8 @@ impl LineByLine for Writer {
             // Manual flushing
             buffered_output_file.flush()?;
         }
+
+        println!("{:?}", pbc_remaining_bits);
 
         Ok(())
     }
