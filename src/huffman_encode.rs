@@ -132,14 +132,14 @@ impl LineByLine for Writer {
                             format_args!(
                                 "{:0width$b}",
                                 // (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
-                                //     +
+                                //     |
                                 (c_g_encode_pair.0
                                     * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
                                         & (*elm_byte & 1u8)
                                         & 1u8))
-                                    + (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
-                                    + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
-                                    + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
+                                    | (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
+                                    | (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
+                                    | (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8)),
                                 width = match (self.g_is_three_bit, *elm_byte) {
                                     (true, b'a' | b'A' | b'c' | b'C' | b't' | b'T') => 2,
                                     (true, b'g' | b'G') => 3,
@@ -157,10 +157,10 @@ impl LineByLine for Writer {
                         * ((((*elm_byte >> 2) & 1u8) ^ ((*elm_byte >> 1) & 1u8))
                             & (*elm_byte & 1u8)
                             & 1u8))
-                        + (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
-                        + (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
-                        + (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8));
-                    // + (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
+                        | (c_g_encode_pair.1 * (((*elm_byte >> 2) & 1u8) & (*elm_byte & 1u8) & 1u8))
+                        | (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8) // (0b01u8 * (!(*elm_byte & 1u8) & !((*elm_byte >> 3) & 1u8) & 1u8))
+                        | (0b1110u8 * (((*elm_byte >> 3) & 1u8) & 1u8));
+                    // | (0b00u8 * (!((*elm_byte >> 2) & 1u8) & !((*elm_byte >> 1) & 1u8) & 1u8))
 
                     let width = match (self.g_is_three_bit, *elm_byte) {
                         (true, b'a' | b'A' | b'c' | b'C' | b't' | b'T') => 2,

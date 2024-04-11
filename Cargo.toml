@@ -1,6 +1,6 @@
 [package]
 name = "interpack"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Jung Soo Lee <jslfree080@gmail.com>"]
 description = "DNA FASTA encoder for compressing raw sequences into searchable binary format"
 license = "GPL-3.0"
